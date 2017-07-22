@@ -17,5 +17,5 @@ Example:
 host 9001 "C:\Users\timeracers\Pictures\hello.jpg" "same password for all of them" "C:\Users\timeracers\Pictures\greetings.jpg"
 
 To download the first file use a web browser and type the ip address of the hoster plus a colon and the port number.
-If you want to download a password protected one then use a tool like postman and add a header for Authorization with the password.
 If you want to download any other file then add "/" and the index (0 based indexing) to the url.
+If you want to download a password protected one then use a tool like postman and add a header for Authorization with the password.
