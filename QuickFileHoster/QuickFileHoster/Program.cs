@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Principal;
 
 namespace QuickFileHoster
 {
@@ -16,6 +17,9 @@ namespace QuickFileHoster
 
         static void Main(string[] args)
         {
+            Console.Title = IsAdmin() ? "Administrator: Quick File Hoster" : "Quick File Hoster";
+            if (!IsAdmin())
+                Console.WriteLine("Administrator privileges are required to host a server");
             Add("HOST", (s) => new Server().Go(s), "Syntax: Host <Port> <IO File Path> [<Password>] [<IO File Path>] [<IO File Path>]...",
                 "Hosts files to local ip with specified password. To download: index in where 0 is the first element");
             Add("EXIT", (s) => notQuitting = false, "Syntax: Exit", "Exits the program");
@@ -46,6 +50,13 @@ namespace QuickFileHoster
                 while (notQuitting)
                     ResolveCommand(ReadCommandLineArgs(Console.ReadLine()));
             Environment.Exit(0);
+        }
+
+        private static bool IsAdmin()
+        {
+            WindowsIdentity identity = WindowsIdentity.GetCurrent();
+            WindowsPrincipal principal = new WindowsPrincipal(identity);
+            return principal.IsInRole(WindowsBuiltInRole.Administrator);
         }
 
         private static void ResolveCommand(string[] input)
