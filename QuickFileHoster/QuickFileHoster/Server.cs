@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
@@ -60,7 +61,18 @@ namespace QuickFileHoster
             _httpListener = new HttpListener();
             var host = "http://" + ip + ":" + args[0] + "/";
             _httpListener.Prefixes.Add(host);
-            _httpListener.Start();
+            try
+            {
+                _httpListener.Start();
+            }
+            catch (Win32Exception ex)
+            {
+                if (ex.NativeErrorCode == 5)
+                    Console.WriteLine("Windows: Access Denied");
+                else if (ex.NativeErrorCode == 32)
+                    Console.WriteLine("Port " + args[0] + " is unavailable.");
+                return;
+            }
             new Thread(ListenToRequests).Start();
             Console.WriteLine("Hosting files at " + host);
         }

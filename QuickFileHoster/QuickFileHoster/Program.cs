@@ -17,7 +17,9 @@ namespace QuickFileHoster
 
         static void Main(string[] args)
         {
-            Console.Title = IsAdmin() ? "Administrator: Quick File Hoster" : "Quick File Hoster";
+            Console.Title = "Quick File Hoster";
+            if (IsAdmin())
+                Console.Title = "Administrator: " + Console.Title;
             if (!IsAdmin())
                 Console.WriteLine("Administrator privileges are required to host a server");
             Add("HOST", (s) => new Server().Go(s), "Syntax: Host <Port> <IO File Path> [<Password>] [<IO File Path>] [<IO File Path>]...",
