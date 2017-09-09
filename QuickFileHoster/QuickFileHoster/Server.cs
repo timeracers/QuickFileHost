@@ -88,27 +88,36 @@ namespace QuickFileHoster
 
         private void ResponseToRequest(HttpListenerContext context)
         {
+            context.Response.AddHeader("Access-Control-Allow-Origin", "*");
             Console.WriteLine("Incoming request from " + context.Request.RemoteEndPoint.ToString());
-            if (!_hasPassword || _password.Equals(context.Request.Headers.Get("Authorization")))
+            try
             {
-                Console.WriteLine("Accepted");
-                var url = context.Request.Url.AbsolutePath;
-                if (url == "/" || url == "")
+                if (!_hasPassword || _password.Equals(context.Request.Headers.Get("Authorization")))
                 {
-                    Console.WriteLine("Index: 0");
-                    context.Response.ContentType = "application/force-download";
-                    context.Response.AddHeader("content-disposition", "attachment;    filename=" + _names[0]);
-                    context.Response.OutputStream.Write(_files[0], 0, _files[0].Length);
-                }
-                else if (url.Length < 10 && IsDigitsOnly(url.Substring(1)))
-                {
-                    var index = uint.Parse(url.Substring(1));
-                    if (index < _files.Length)
+                    Console.WriteLine("Accepted");
+                    var url = context.Request.Url.AbsolutePath;
+                    if (url == "/" || url == "")
                     {
-                        Console.WriteLine("Index: " + url.Substring(1));
+                        Console.WriteLine("Index: 0");
                         context.Response.ContentType = "application/force-download";
                         context.Response.AddHeader("content-disposition", "attachment;    filename=" + _names[0]);
-                        context.Response.OutputStream.Write(_files[index], 0, _files[index].Length);
+                        context.Response.OutputStream.Write(_files[0], 0, _files[0].Length);
+                    }
+                    else if (url.Length < 10 && IsDigitsOnly(url.Substring(1)))
+                    {
+                        var index = uint.Parse(url.Substring(1));
+                        if (index < _files.Length)
+                        {
+                            Console.WriteLine("Index: " + url.Substring(1));
+                            context.Response.ContentType = "application/force-download";
+                            context.Response.AddHeader("content-disposition", "attachment;    filename=" + _names[0]);
+                            context.Response.OutputStream.Write(_files[index], 0, _files[index].Length);
+                        }
+                        else
+                        {
+                            context.Response.StatusCode = 404;
+                            context.Response.OutputStream.Write(NOT_FOUND, 0, NOT_FOUND.Length);
+                        }
                     }
                     else
                     {
@@ -118,15 +127,14 @@ namespace QuickFileHoster
                 }
                 else
                 {
-                    context.Response.StatusCode = 404;
-                    context.Response.OutputStream.Write(NOT_FOUND, 0, NOT_FOUND.Length);
+                    Console.WriteLine("Denied");
+                    context.Response.StatusCode = 401;
+                    context.Response.OutputStream.Write(DENIED, 0, DENIED.Length);
                 }
             }
-            else
+            catch
             {
-                Console.WriteLine("Denied");
-                context.Response.StatusCode = 401;
-                context.Response.OutputStream.Write(DENIED, 0, DENIED.Length);
+                Console.WriteLine("Aborted");
             }
             context.Response.KeepAlive = false;
             context.Response.Close();
