@@ -1,6 +1,6 @@
 node {
     checkout scm
     
-    bat 'nuget restore QuickFileHoster/QuickFileHoster.sln'
+    bat 'C:\tools\NuGet\nuget.exe" restore QuickFileHoster/QuickFileHoster.sln'
     bat "\"${tool 'MSBuild'}\" QuickFileHoster/QuickFileHoster.sln /p:Configuration=Release /p:Platform=\"Any CPU\" /p:ProductVersion=1.0.0.${env.BUILD_NUMBER}"
 }
