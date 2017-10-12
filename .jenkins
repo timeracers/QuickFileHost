@@ -1,4 +1,5 @@
 node {
+    echo "test"
     checkout scm
     
     bat '"C:/tools/NuGet/nuget.exe" restore QuickFileHoster/QuickFileHoster.sln'
