@@ -48,9 +48,15 @@ namespace QuickFileHoster
             }, "Syntax: Help", "Writes the help section of each command",
                 "Syntax: Help <Command> [<Command>] [<Command>]...", "Writes the help section of those commands");
 
-            if (args.Length == 0)
-                while (notQuitting)
-                    ResolveCommand(ReadCommandLineArgs(Console.ReadLine()));
+            if (args.Length > 0)
+            {
+                Console.WriteLine("Starting with specified command");
+                ResolveCommand(args);
+            }
+            Console.WriteLine("Started, you can now type commands");
+
+            while (notQuitting)
+                ResolveCommand(ReadCommandLineArgs(Console.ReadLine()));
             Environment.Exit(0);
         }
 

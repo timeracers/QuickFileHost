@@ -88,7 +88,6 @@ namespace QuickFileHoster
 
         private void ResponseToRequest(HttpListenerContext context)
         {
-            context.Response.AddHeader("Access-Control-Allow-Origin", "*");
             Console.WriteLine("Incoming request from " + context.Request.RemoteEndPoint.ToString());
             try
             {
