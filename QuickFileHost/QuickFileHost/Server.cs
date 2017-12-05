@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Linq;
 
-namespace QuickFileHoster
+namespace QuickFileHost
 {
     public class Server
     {

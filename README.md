@@ -1,4 +1,4 @@
-# QuickFileHoster
+# QuickFileHost
 ### A console app for quick and simple file hosting.
 
 To host a file, type:  

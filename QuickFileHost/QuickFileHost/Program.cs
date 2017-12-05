@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Security.Principal;
 
-namespace QuickFileHoster
+namespace QuickFileHost
 {
     public static class Program
     {
@@ -17,7 +17,7 @@ namespace QuickFileHoster
 
         static void Main(string[] args)
         {
-            Console.Title = "Quick File Hoster";
+            Console.Title = "Quick File Host";
             if (IsAdmin())
                 Console.Title = "Administrator: " + Console.Title;
             if (!IsAdmin())
