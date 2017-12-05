@@ -23,10 +23,12 @@ namespace QuickFileHoster
             if (!IsAdmin())
                 Console.WriteLine("Administrator privileges are required to host a server");
             Add("HOST", (s) => new Server().Host(s), "Syntax: Host <Port> <IO File Path> [<Password>] [<IO File Path>] [<IO File Path>]...",
-                "Hosts files to the local ip with specified password. To download: index in where 0 is the first element.");
+                "Hosts files to the local ip with specified password. To download: index in where 0 is the first element.",
+                "This will cache files, which will allow you to delete them and have this continue to work.");
             Add("HOSTFOLDER", (s) => new Server().HostFolder(s), "Syntax: Hostfolder <Port> <Folder> [<Password>]",
                 "Recursively hosts all files of the specified folder to the local ip with the specified password.",
-                "To download: specify the file location relative to the folder.");
+                "To download: specify the file location relative to the folder.",
+                "This won't cache files, which means changes to them will be reflected to users.");
             Add("EXIT", (s) => notQuitting = false, "Syntax: Exit", "Exits the program");
             Add("QUIT", (s) => notQuitting = false, "Syntax: Quit", "Exits the program");
             Add("Clear", (s) => Console.Clear(), "Syntax: Clear", "Clears the console");

@@ -6,6 +6,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Linq;
 
 namespace QuickFileHoster
 {
@@ -207,9 +208,11 @@ namespace QuickFileHoster
                             Console.WriteLine("Relative Path: " + url);
                             try
                             {
-                                var contents = string.Join("\r\n", Directory.GetFileSystemEntries(_folder + url));
-                                var contentsAsBytes = Encoding.ASCII.GetBytes(contents);
-                                context.Response.OutputStream.Write(contentsAsBytes, 0, contentsAsBytes.Length);
+                                var entries = Directory.GetFileSystemEntries(_folder + url);
+                                entries = entries.Select(e => e.Substring(Math.Max(e.LastIndexOf("\\"), e.LastIndexOf("/")) + 1)).ToArray();
+                                var entriesAsString = string.Join("\r\n", entries);
+                                var entriesAsBytes = Encoding.ASCII.GetBytes(entriesAsString);
+                                context.Response.OutputStream.Write(entriesAsBytes, 0, entriesAsBytes.Length);
                             }
                             catch
                             {
