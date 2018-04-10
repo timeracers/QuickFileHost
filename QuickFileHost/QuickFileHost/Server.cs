@@ -7,6 +7,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace QuickFileHost
 {
@@ -15,7 +16,6 @@ namespace QuickFileHost
         private byte[] NOT_FOUND = Encoding.ASCII.GetBytes("Not Found");
         private byte[] DENIED = Encoding.ASCII.GetBytes("Denied");
         private byte[] GONE = Encoding.ASCII.GetBytes("Resource was Removed");
-        private string ERRORED = "";
 
         private HttpListener _httpListener;
         private string[] _names;
@@ -32,10 +32,10 @@ namespace QuickFileHost
                 Console.WriteLine("Not enough parameters, use 2 or more parameters");
                 return;
             }
-            var ip = GetLocalIPAddress();
-            if (ip == ERRORED)
+            var ip = GetLocalIPAddresses();
+            if (ip.Count() == 0)
             {
-                Console.WriteLine("Local IP address not found");
+                Console.WriteLine("No Local IP addresses found");
                 return;
             }
 
@@ -63,23 +63,7 @@ namespace QuickFileHost
                 _files[i - 2] = File.ReadAllBytes(args[i]);
             }
 
-            _httpListener = new HttpListener();
-            var host = "http://" + ip + ":" + args[0] + "/";
-            _httpListener.Prefixes.Add(host);
-            try
-            {
-                _httpListener.Start();
-            }
-            catch (Win32Exception ex)
-            {
-                if (ex.NativeErrorCode == 5)
-                    Console.WriteLine("Windows: Access Denied");
-                else if (ex.NativeErrorCode == 32)
-                    Console.WriteLine("Port " + args[0] + " is unavailable.");
-                return;
-            }
-            new Thread(ListenToRequests).Start();
-            Console.WriteLine("Hosting files at " + host);
+            SetupHttpListener(args[0], ip);
         }
 
         public void HostFolder(string[] args)
@@ -89,10 +73,10 @@ namespace QuickFileHost
                 Console.WriteLine("Not enough parameters, use 2 or more parameters");
                 return;
             }
-            var ip = GetLocalIPAddress();
-            if (ip == ERRORED)
+            var ip = GetLocalIPAddresses();
+            if(ip.Count() == 0)
             {
-                Console.WriteLine("Local IP address not found");
+                Console.WriteLine("No Local IP addresses found");
                 return;
             }
 
@@ -107,11 +91,15 @@ namespace QuickFileHost
             }
             _hostsFolder = true;
             _folder = args[1];
+            SetupHttpListener(args[0], ip);
+        }
 
-
+        private void SetupHttpListener(string port, IEnumerable<string> ip)
+        {
             _httpListener = new HttpListener();
-            var host = "http://" + ip + ":" + args[0] + "/";
-            _httpListener.Prefixes.Add(host);
+            var hostLocations = ip.Select(i => "http://" + i + ":" + port + "/");
+            foreach (var location in hostLocations)
+                _httpListener.Prefixes.Add(location);
             try
             {
                 _httpListener.Start();
@@ -121,12 +109,12 @@ namespace QuickFileHost
                 if (ex.NativeErrorCode == 5)
                     Console.WriteLine("Windows: Access Denied");
                 else if (ex.NativeErrorCode == 32)
-                    Console.WriteLine("Port " + args[0] + " is unavailable.");
+                    Console.WriteLine("Port " + port + " is unavailable.");
                 return;
             }
             new Thread(ListenToRequests).Start();
-
-            Console.WriteLine("Hosting files at " + host);
+            foreach(var location in hostLocations)
+                Console.WriteLine("Hosting files at " + location);
         }
 
         private void ListenToRequests()
@@ -251,13 +239,12 @@ namespace QuickFileHost
             return true;
         }
 
-        private string GetLocalIPAddress()
+        private IEnumerable<string> GetLocalIPAddresses()
         {
             var host = Dns.GetHostEntry(Dns.GetHostName());
             foreach (var ip in host.AddressList)
                 if (ip.AddressFamily == AddressFamily.InterNetwork)
-                    return ip.ToString();
-            return ERRORED;
+                    yield return ip.ToString();
         }
     }
 }
