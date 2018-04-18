@@ -47,7 +47,7 @@ namespace QuickFileHost
             _files = new byte[_hasPassword ? args.Length - 2 : 1][];
             if (!File.Exists(args[1]))
             {
-                Console.WriteLine("File does not exist");
+                Console.WriteLine("File does not exist: " + args[1]);
                 return;
             }
             _names[0] = Path.GetFileName(args[1]);
@@ -56,7 +56,7 @@ namespace QuickFileHost
             {
                 if (!File.Exists(args[i]))
                 {
-                    Console.WriteLine("File does not exist");
+                    Console.WriteLine("File does not exist: " + args[i]);
                     return;
                 }
                 _names[i - 2] = Path.GetFileName(args[i]);
@@ -182,11 +182,12 @@ namespace QuickFileHost
                             {
                                 var file = File.ReadAllBytes(_folder + url);
                                 context.Response.ContentType = "application/force-download";
-                                context.Response.AddHeader("content-disposition", "attachment;    filename=" + url.Substring(url.LastIndexOf("/" + 1)));
+                                context.Response.AddHeader("content-disposition", "attachment;    filename=" + url.Substring(url.LastIndexOf("/") + 1));
                                 context.Response.OutputStream.Write(file, 0, file.Length);
                             }
                             catch
                             {
+                                Console.WriteLine("Gone");
                                 context.Response.StatusCode = 410;
                                 context.Response.OutputStream.Write(GONE, 0, GONE.Length);
                             }
@@ -204,6 +205,7 @@ namespace QuickFileHost
                             }
                             catch
                             {
+                                Console.WriteLine("Gone");
                                 context.Response.StatusCode = 410;
                                 context.Response.OutputStream.Write(GONE, 0, GONE.Length);
                             }
